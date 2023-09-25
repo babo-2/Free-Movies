@@ -67,7 +67,7 @@
           return;
         }
 
-        fetch(`/search/${keyword}/50`)
+        fetch(`/search/${keyword}/100`)
           .then((response) => response.json())
           .then((data) => {
             resultsDiv.innerHTML = "";
