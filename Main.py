@@ -11,7 +11,7 @@ def encode_(str_):
     return str_.replace("'", "531634").replace('"', "972348")
 
 
-def search(keyword, amount=24):
+def search(keyword, amount=60):
     print("searching: " + keyword)
     movies = ia.search_movie_advanced(keyword, results=amount, adult=True)
     movie_list = []
@@ -46,9 +46,9 @@ def search(keyword, amount=24):
     return movie_list
 
 
-@app.route("/search/<keyword>", methods=["GET"])
-def search_endpoint(keyword):
-    results = search(keyword)
+@app.route("/search/<keyword>/<amount>", methods=["GET"])
+def search_endpoint(keyword, amount="24"):
+    results = search(keyword, int(amount))
     return jsonify(results)
 
 
