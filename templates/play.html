@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Video Playback</title>
+    <style>
+      .string-list {
+        max-height: 7em; /* Adjust the height as needed */
+        overflow-y: scroll;
+        margin: 10px;
+        padding: 10px;
+      }
+
+      .string-item {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Video Playback</h1>
+    <iframe
+      width="560"
+      height="315"
+      src="{{ video_url }}"
+      frameborder="0"
+      allowfullscreen
+    ></iframe>
+    <div class="string-list" id="stringList">
+      <!-- Your strings will be added here dynamically -->
+    </div>
+    <p><a href="/">Back to Search</a></p>
+    <script>
+      function decode(dec) {
+        return dec.replaceAll("531634", "'").replaceAll("972348", '"');
+      }
+      var strings = decode("{{ episodes }}");
+      strings = JSON.parse(strings);
+      const stringList = document.getElementById("stringList");
+
+      strings.forEach((str, index) => {
+        const stringItem = document.createElement("div");
+        stringItem.style.background = "grey";
+        stringItem.classList.add("string-item");
+        stringItem.textContent = `${index + 1}. ${str[0]}`;
+
+        stringItem.addEventListener("click", () => {
+          window.location.href = "/play/" + str[1] + "/1/" + (index + 1);
+        });
+
+        stringList.appendChild(stringItem);
+      });
+    </script>
+  </body>
+</html>
