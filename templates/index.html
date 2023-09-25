@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Page</title>
+    <style>
+      body {
+        background-color: grey;
+        text-align: center;
+      }
+      #search-bar {
+        margin-top: 20px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        width: 300px;
+        font-size: 16px;
+      }
+      #results {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .result {
+        margin: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100px;
+        text-align: center;
+      }
+      .thumbnail {
+        width: 100px;
+        height: 140px;
+        object-fit: cover;
+      }
+      .title {
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .details {
+        font-size: 10px;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <input
+      type="text"
+      id="search-bar"
+      placeholder="Search..."
+      onkeydown="if (event.key === 'Enter') search()"
+    />
+    <div id="results"></div>
+    <footer>made by babo_2</footer>
+    <script>
+      const searchInput = document.getElementById("search-bar");
+      const resultsDiv = document.getElementById("results");
+
+      function search() {
+        const keyword = searchInput.value;
+        if (keyword.trim() === "") {
+          resultsDiv.innerHTML = "";
+          return;
+        }
+
+        fetch(`/search/${keyword}`)
+          .then((response) => response.json())
+          .then((data) => {
+            resultsDiv.innerHTML = "";
+            data.forEach((item) => {
+              const resultDiv = document.createElement("div");
+              resultDiv.className = "result";
+              resultDiv.style.height = `${140 + 3 * 16}px`;
+              resultDiv.dataset.customdata = item.id;
+              var type =
+                '<span style="border: 1px solid white; border-radius: 10px; padding-left: 5px; padding-right: 5px;">Movie</span>';
+              if (item.type.toUpperCase() == "TV SERIES") {
+                type = " SS 1 ";
+              }
+              resultDiv.innerHTML = `
+                            <img src="${item.thumbnail}" alt="Thumbnail" class="thumbnail">
+                            <div class="details">
+                                <div>${item.year}  ${type}   ${item.lenght}min</div>
+                                <div class="title">${item.title}</div>
+                            </div>
+                        `;
+              resultDiv.addEventListener("click", function () {
+                window.location.href =
+                  "/play/" + resultDiv.dataset.customdata + "/1/1";
+              });
+              resultsDiv.appendChild(resultDiv);
+            });
+          })
+          .catch((error) => console.error(error));
+      }
+    </script>
+  </body>
+</html>
