@@ -13,7 +13,7 @@ def encode_(str_):
 
 def search(keyword, amount=100):
     print("searching: " + keyword)
-    movies = ia.search_movie_advanced(keyword, results=amount, adult=True)
+    movies = ia.search_movie(keyword, results=amount)
     movie_list = []
 
     #print("keys: " + str(movies[0].keys()))
