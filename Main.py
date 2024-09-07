@@ -82,5 +82,5 @@ def play(video_id, season="1", episode="1"):
     return render_template("play.html", video_url=url, episodes=encode_(json.dumps(episodes)))
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=False, host="0.0.0.0", port=os.getenv("PORT", default=5000))
