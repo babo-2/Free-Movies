@@ -83,4 +83,4 @@ def play(video_id, season="1", episode="1"):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=2235)
+    app.run(debug=True)
