@@ -1,6 +1,7 @@
 from imdb import IMDb
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_from_directory
 import json
+import os
 
 ia = IMDb()
 ia.doAdult = True
@@ -10,10 +11,9 @@ app = Flask(__name__)
 def encode_(str_):
     return str_.replace("'", "531634").replace('"', "972348")
 
-
-def search(keyword, amount=100):
+def search(keyword, amount=24):
     print("searching: " + keyword)
-    movies = ia.search_movie(keyword, results=amount)
+    movies = ia.search_movie_advanced(keyword, results=amount, adult=True)
     movie_list = []
 
     #print("keys: " + str(movies[0].keys()))
@@ -45,12 +45,20 @@ def search(keyword, amount=100):
 
     return movie_list
 
-
-@app.route("/search/<keyword>/<amount>", methods=["GET"])
-def search_endpoint(keyword, amount="50"):
-    results = search(keyword, int(amount))
+@app.route("/search/<keyword>", methods=["GET"])
+def search_endpoint(keyword):
+    results = search(keyword)
     return jsonify(results)
 
+
+@app.route('/downloads')
+def downloads():
+    files = os.listdir("downloads")
+    return render_template('downloads.html', files=files)
+
+@app.route('/downloads/<path:filename>')
+def serve_file(filename):
+    return send_from_directory("downloads", filename, as_attachment=True)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -75,4 +83,4 @@ def play(video_id, season="1", episode="1"):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, port=2235)
