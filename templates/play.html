@@ -4,51 +4,81 @@
     <meta charset="UTF-8" />
     <title>Video Playback</title>
     <style>
-      .string-list {
-        max-height: 7em; /* Adjust the height as needed */
+      .episodes {
+        max-height: 7em;
         overflow-y: scroll;
         margin: 10px;
         padding: 10px;
       }
 
-      .string-item {
+      .episode {
         cursor: pointer;
       }
+
+      .seasons {
+        max-height: 7em;
+        overflow-y: visible;
+        margin: 10px;
+        padding: 10px;
+      }
+
+      .season {
+        cursor: pointer;
+      }
+
     </style>
   </head>
   <body>
     <h1>Video Playback</h1>
     <iframe
+    enabled="false"
       width="560"
       height="315"
       src="{{ video_url }}"
       frameborder="0"
       allowfullscreen
     ></iframe>
-    <div class="string-list" id="stringList">
-      <!-- Your strings will be added here dynamically -->
+        <div class="seasons" id="seasons">
+    </div>
+    <br>
+    <div class="episodes" id="episodes">
     </div>
     <p><a href="/">Back to Search</a></p>
     <script>
-      function decode(dec) {
-        return dec.replaceAll("531634", "'").replaceAll("972348", '"');
-      }
-      var strings = decode("{{ episodes }}");
-      strings = JSON.parse(strings);
-      const stringList = document.getElementById("stringList");
+    let isMovie = {{ 'true' if is_movie else 'false' }};
 
-      strings.forEach((str, index) => {
-        const stringItem = document.createElement("div");
-        stringItem.style.background = "grey";
-        stringItem.classList.add("string-item");
-        stringItem.textContent = `${index + 1}. ${str[0]}`;
+      if (!isMovie){
+      var episodes = {{ episodes|safe }};
+      const episodes_div = document.getElementById("episodes");
+      const seasons_div = document.getElementById("seasons");
 
-        stringItem.addEventListener("click", () => {
-          window.location.href = "/play/" + str[1] + "/1/" + (index + 1);
+      var seasons = {{ seasons|safe }};
+
+      seasons.forEach((name, index) => {
+        const season = document.createElement("div");
+        season.style.background = "grey";
+        season.classList.add("season");
+        season.textContent = name;
+
+        season.addEventListener("click", () => {
+          window.location.href = "/play/{{ video_id }}/" + (index + 1) + "/1";
+        });
+        seasons_div.appendChild(season);
+      });
+
+      episodes.forEach((name, index) => {
+        const episode = document.createElement("div");
+        episode.style.background = "grey";
+        episode.classList.add("episode");
+        episode.textContent = `${index + 1}. ${name}`;
+
+        episode.addEventListener("click", () => {
+          window.location.href = "/play/{{ video_id }}/{{ current_season }}/" + (index + 1);
         });
 
-        stringList.appendChild(stringItem);
+        episodes_div.appendChild(episode);
       });
+      }
     </script>
   </body>
 </html>

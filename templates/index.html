@@ -4,95 +4,446 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Search Page</title>
-    <style>
-      body {
-        background-color: grey;
-        text-align: center;
-      }
-      #search-bar {
-        margin-top: 20px;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        width: 300px;
-        font-size: 16px;
-      }
-      #results {
-        margin-top: 20px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-      .result {
-        margin: 10px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        width: 100px;
-        text-align: center;
-      }
-      .thumbnail {
-        width: 100px;
-        height: 140px;
-        object-fit: cover;
-      }
-      .title {
-        white-space: normal;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .details {
-        font-size: 10px;
-        margin-top: 5px;
-      }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>   
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            justify-content: center;
+        }
+        
+        .movie-card {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .movie-thumbnail {
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .movie-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .movie-card:hover .movie-thumbnail img {
+            transform: scale(1.1);
+        }
+        
+        .movie-details {
+            padding: 15px;
+        }
+        
+        .movie-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #222;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .movie-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .movie-rating {
+            display: flex;
+            align-items: center;
+            background: #f8f8f8;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .movie-rating i {
+            color: #ffc107;
+            margin-right: 5px;
+        }
+        
+        .movie-duration {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .movie-year {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .hover-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+            text-align: center;
+            overflow: hidden;
+        }
+        
+        .movie-card:hover .hover-content {
+            opacity: 1;
+        }
+        
+        .hover-text {
+            overflow-y: auto;
+            max-height: 70%;
+            padding-right: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .hover-text::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .hover-text::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .hover-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .hover-content p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            text-align: left;
+        }
+        
+        .play-button {
+            background: #ff2c2c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+        
+        .play-button i {
+            margin-right: 8px;
+        }
+        
+        .play-button:hover {
+            background: #ff5252;
+        }
+        
+        @media (max-width: 768px) {
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+            }
+            
+            .movie-thumbnail {
+                height: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .movies-grid {
+                grid-template-columns: 1fr;
+                max-width: 320px;
+                margin: 0 auto;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
     </style>
+
+  <style>
+    .search-bar{
+            position: absolute; 
+            top: 0;             
+            left: 50%;       
+            transform: translateX(-50%); 
+            padding: 60px 20px;
+        }
+
+    input.search-bar-input {
+      width: 400px;
+      border: 2px solid #ccc;
+      border-radius: 40px; 
+      padding: 10px 16px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.2s ease-in-out;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    input.search-bar-input:focus {
+      border-color: #007BFF;
+      box-shadow: 0 0 6px rgba(0,123,255,0.4);
+    }
+
+    input.search-bar-input::placeholder {
+      color: #aaa;
+      font-style: italic;
+    }
+  </style>
+
   </head>
   <body>
-    <input
-      type="text"
-      id="search-bar"
-      placeholder="Search..."
-      onkeydown="if (event.key === 'Enter') search()"
-    />
-    <div id="results"></div>
-    <footer>made by babo_2</footer>
+
+    <div class="search-bar">
+      <input
+        class="search-bar-input"
+        type="text"
+        id="search-bar"
+        placeholder="Search..."
+        onkeydown="if (event.key === 'Enter') search()"
+      />
+      <select id="search_amount" name="search_results">
+        <option value="3" selected>3</option>
+        <option value="5" >5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <div class="container">
+      <h1 hidden id="search_result_p">search results for: </h1>
+      <div id="results" class="movies-grid"></div>
+    </div>
+
     <script>
+
+      let results = 3;
+      const search_results_select = document.getElementById("search_amount")
+
+      search_results_select.addEventListener('change', () => {
+        results = parseInt(search_results_select.value, 10);
+      });
+
       const searchInput = document.getElementById("search-bar");
       const resultsDiv = document.getElementById("results");
 
       function search() {
         const keyword = searchInput.value;
+        document.getElementById("search_result_p").hidden=false;
+        document.getElementById("search_result_p").innerText="search results for: " + keyword;
         if (keyword.trim() === "") {
           resultsDiv.innerHTML = "";
           return;
         }
 
-        fetch(`/search/${keyword}/100`)
+        fetch(`/search/${keyword}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Search-Amount": "" + results,
+            }
+          })
           .then((response) => response.json())
           .then((data) => {
             resultsDiv.innerHTML = "";
             data.forEach((item) => {
               const resultDiv = document.createElement("div");
-              resultDiv.className = "result";
-              resultDiv.style.height = `${140 + 3 * 16}px`;
+              resultDiv.className = "movie-card";
+
+              //resultDiv.style.height = `${140 + 3 * 16}px`;
               resultDiv.dataset.customdata = item.id;
-              var type =
-                '<span style="border: 1px solid white; border-radius: 10px; padding-left: 5px; padding-right: 5px;">Movie</span>';
-              if (item.type.toUpperCase() == "TV SERIES") {
-                type = " SS 1 ";
+
+              const movie_thumbnail = document.createElement("div");
+              movie_thumbnail.className = "movie-thumbnail";
+
+              const img = document.createElement("img");
+              img.src=item.thumbnail;
+              img.alt="Thumbnail-"+item.title;
+              movie_thumbnail.appendChild(img)
+
+              const hover_content = document.createElement("div");
+              hover_content.className = "hover-content";
+              const title_content = document.createElement("h3");
+              title_content.innerText=item.title
+              const description_content = document.createElement("p");
+              description_content.innerText=item.plot
+              const watch_now_button = document.createElement("button");
+              const fas_fa_play = document.createElement("i");
+              fas_fa_play.className="fas fa-play"
+              watch_now_button.className="play-button"
+              watch_now_button.appendChild(fas_fa_play)
+              watch_now_button.innerText=" Watch Now"
+
+              const hover_text = document.createElement("div");
+              hover_text.className = "hover-text";
+
+              hover_text.appendChild(title_content)
+              hover_text.appendChild(description_content)
+              hover_content.appendChild(hover_text)
+              hover_content.appendChild(watch_now_button)
+
+              movie_thumbnail.appendChild(hover_content)
+
+
+              const movie_details = document.createElement("div");
+              movie_details.className="movie-details"
+
+              const title_content2 = document.createElement("h3");
+              title_content2.className="movie-title"
+              title_content2.innerText=item.title
+              const movie_info = document.createElement("div");
+              movie_info.className="movie-info"
+              const movie_rating = document.createElement("div");
+              movie_rating.className="movie-rating"
+              const fas_fa_star2 = document.createElement("i");
+              fas_fa_star2.className="fas fa-star"
+              const span_ = document.createElement("span");
+              span_.innerText=item.rating
+              movie_rating.appendChild(fas_fa_star2)
+              movie_rating.appendChild(span_)
+              
+              const movie_duration = document.createElement("div");
+              movie_duration.className="movie-duration"
+              if (item.IsMovie){
+                  movie_duration.innerText=item.lenght+"m"
+              }else{
+                  movie_duration.innerText="TV"
+                  movie_duration.style.fontWeight="800"
               }
-              resultDiv.innerHTML = `
-                            <img src="${item.thumbnail}" alt="Thumbnail" class="thumbnail">
-                            <div class="details">
-                                <div>${item.year}  ${type}   ${item.lenght}min</div>
-                                <div class="title">${item.title}</div>
-                            </div>
-                        `;
+              movie_info.appendChild(movie_rating)
+              movie_info.appendChild(movie_duration)
+              
+              const movie_year = document.createElement("div");
+              movie_year.className="movie-year"
+              movie_year.innerText=item.year
+              movie_details.appendChild(title_content2)
+              movie_details.appendChild(movie_info)
+              movie_details.appendChild(movie_year)
+
+              resultDiv.appendChild(movie_thumbnail)
+              resultDiv.appendChild(movie_details)
+
               resultDiv.addEventListener("click", function () {
                 window.location.href =
                   "/play/" + resultDiv.dataset.customdata + "/1/1";
               });
               resultsDiv.appendChild(resultDiv);
+
+/*
+              TitleDiv.className="title"
+              TitleDiv.innerText=item.title
+
+              if (item.type.toUpperCase() == "TV SERIES"){
+                informationDiv.innerText=item.year
+              }else{
+                const typeDiv = document.createElement("span");
+                typeDiv.style="border: 1px solid white; border-radius: 10px; padding-left: 5px; padding-right: 5px;";
+                typeDiv.innerText="Movie"
+                informationDiv.appendChild(typeDiv);
+                informationDiv.innerText=item.year + "   " + item.lenght
+              }
+
+              detailsDiv.appendChild(TitleDiv);
+              detailsDiv.appendChild(informationDiv);
+              
+              resultDiv.appendChild(detailsDiv)
+*/
+
+/*
+            <div class="movie-card">
+                <div class="movie-thumbnail">
+                    <img src="https://source.unsplash.com/random/300x450?sig=1&movie" alt="Inception">
+                    <div class="hover-content">
+                        <h3>Inception</h3>
+                        <p>A thief who steals corporate secrets by entering the subconscious of his targets.</p>
+                        <button class="play-button"><i class="fas fa-play"></i> Watch Now</button>
+                    </div>
+                </div>
+                <div class="movie-details">
+                    <h3 class="movie-title">Inception</h3>
+                    <div class="movie-info">
+                        <div class="movie-rating">
+                            <i class="fas fa-star"></i>
+                            <span>8.8</span>
+                        </div>
+                        <div class="movie-duration">148m</div>
+                    </div>
+                    <div class="movie-year">2010</div>
+                </div>
+            </div>
+*/
+
+
+
+              /*
+              resultDiv.innerHTML = `
+                            <img src="${item.thumbnail}" alt="Thumbnail" class="thumbnail">
+                            <div class="details">
+                                <div>${type}   ${item.year}     ${item.lenght}min</div>
+                                <div class="title">${item.title}</div>
+                            </div>
+                        `;*/
             });
           })
           .catch((error) => console.error(error));
