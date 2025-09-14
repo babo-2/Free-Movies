@@ -65,11 +65,11 @@ def play(video_id, season="1", episode="1"):
         CURRENT_MOVIE=movie.copy()
         episodes = [episode["title"] for episode in movie['episodes'][int(season)].values()]
         url = "https://vidsrc.to/embed/tv/tt" + video_id + "/" + season + "/" + episode
-        return render_template("play.html", video_url=url, is_movie=False, video_id=video_id, current_season=season, episodes=json.dumps(episodes), seasons=sorted(movie['episodes'].keys(), key=lambda x: (isinstance(x, str), x)))
+        return render_template("play.html", video_url=url, is_movie=False, title=movie["title"], video_id=video_id, current_season=season, episodes=json.dumps(episodes), seasons=sorted(movie['episodes'].keys(), key=lambda x: (isinstance(x, str), x)))
     else:
         CURRENT_MOVIE=movie.copy()
         url = "https://vidsrc.to/embed/movie/tt" + video_id
-        return render_template("play.html", video_url=url, is_movie=True)
+        return render_template("play.html", video_url=url, is_movie=True, title=movie["title"])
 
 
 if __name__ == "__main__":
