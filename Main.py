@@ -1,25 +1,19 @@
-from imdb import IMDb
-from flask import Flask, render_template, jsonify, send_from_directory
+from imdb import Cinemagoer
+from flask import Flask, render_template, jsonify, request
 import json
-import os
 
-ia = IMDb()
+ia = Cinemagoer()
 ia.doAdult = True
 app = Flask(__name__)
 
+CURRENT_MOVIE=None
 
-def encode_(str_):
-    return str_.replace("'", "531634").replace('"', "972348")
-
-def search(keyword, amount=24):
-    print("searching: " + keyword)
+def search(keyword, amount=5):#the amount is a big bottleneck due to thumbnail only updating with main
     movies = ia.search_movie_advanced(keyword, results=amount, adult=True)
     movie_list = []
-
-    #print("keys: " + str(movies[0].keys()))
-    #print("values: " + str(movies[0].values()))
     for movie in movies:
         thumnail = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"
+        ia.update(movie, 'main')
         if "full-size cover url" in movie.keys():
             thumnail = movie["full-size cover url"]
         elif "cover url" in movie.keys():
@@ -29,6 +23,7 @@ def search(keyword, amount=24):
             thumnail = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"
 
         movie_info = {
+            "IsMovie": (movie.get("kind", "N/A").upper() == "MOVIE"),
             "title": movie["title"],
             "id": movie.getID(),
             "thumbnail": thumnail,
@@ -47,40 +42,35 @@ def search(keyword, amount=24):
 
 @app.route("/search/<keyword>", methods=["GET"])
 def search_endpoint(keyword):
-    results = search(keyword)
+    results = search(keyword, amount=int(request.headers.get("Search-Amount", "3")))
     return jsonify(results)
-
-
-@app.route('/downloads')
-def downloads():
-    files = os.listdir("downloads")
-    return render_template('downloads.html', files=files)
-
-@app.route('/downloads/<path:filename>')
-def serve_file(filename):
-    return send_from_directory("downloads", filename, as_attachment=True)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     return render_template("index.html")
 
-
 @app.route("/play/<string:video_id>/<string:season>/<string:episode>")
 def play(video_id, season="1", episode="1"):
-    movie = ia.get_movie(video_id)
+    global CURRENT_MOVIE
+    if CURRENT_MOVIE and str(CURRENT_MOVIE.getID())==video_id:
+        movie=CURRENT_MOVIE.copy()
+    else:
+        movie = ia.get_movie(video_id)
+
     if movie == None:
         return "Error: " + video_id + " doesn't exist"
-    episodes = ""
-    url = ""
     if movie.get("kind", "N/A").upper() == "TV SERIES":
-        # print(ia.search_episode(movie["title"])[0].keys())
-        episodes = [[obj["title"], movie.getID()]
-                    for obj in ia.search_episode(movie["title"])]
+        if "episodes" not in movie:
+            ia.update(movie, "episodes")
+        CURRENT_MOVIE=movie.copy()
+        episodes = [episode["title"] for episode in movie['episodes'][int(season)].values()]
         url = "https://vidsrc.to/embed/tv/tt" + video_id + "/" + season + "/" + episode
+        return render_template("play.html", video_url=url, is_movie=False, video_id=video_id, current_season=season, episodes=json.dumps(episodes), seasons=sorted(movie['episodes'].keys(), key=lambda x: (isinstance(x, str), x)))
     else:
-        url = "https://vidsrc.to/embed/movie/" + video_id
-    return render_template("play.html", video_url=url, episodes=encode_(json.dumps(episodes)))
+        CURRENT_MOVIE=movie.copy()
+        url = "https://vidsrc.to/embed/movie/tt" + video_id
+        return render_template("play.html", video_url=url, is_movie=True)
 
 
-if __name__ == '__main__':
-    app.run(debug=False, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+if __name__ == "__main__":
+    app.run(debug=True, port=2235)
