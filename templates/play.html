@@ -5,31 +5,51 @@
     <title>Video Playback</title>
     <style>
       .episodes {
-        max-height: 7em;
+        position: relative;
+        max-height: 20%;
         overflow-y: scroll;
         margin: 10px;
         padding: 10px;
       }
 
       .episode {
+        font-size: 20px;
         cursor: pointer;
+        padding-bottom: 5px;
+        padding-top: 5px;
+        padding-left: 10px;
+        background-color: #444;
+        transition: background-color 0.3s ease;
+      }
+
+      .episode:hover {
+        background-color: #666;
       }
 
       .seasons {
-        max-height: 7em;
+        max-width: 80%;
         overflow-y: visible;
-        margin: 10px;
-        padding: 10px;
+        display: flex; 
+        gap: 0px; 
+        padding: 20px;
       }
 
       .season {
-        cursor: pointer;
+        /*cursor: pointer;*/
+        align-items: center;
+        background-color: #444;
+        transition: background-color 0.3s ease;
+        padding: 15px;
+      }
+
+      .season:hover {
+        background-color: #666;      /* brighter version */
       }
 
     </style>
   </head>
   <body>
-    <h1>Video Playback</h1>
+    <h1>{{ title }}</h1>
     <iframe
     enabled="false"
       width="560"
@@ -38,16 +58,15 @@
       frameborder="0"
       allowfullscreen
     ></iframe>
-        <div class="seasons" id="seasons">
-    </div>
-    <br>
-    <div class="episodes" id="episodes">
-    </div>
+    
+    <div class="seasons" id="seasons"></div>
+    <hr style="margin-left: 20px;margin-right: 0">
+    <div class="episodes" id="episodes"></div>
     <p><a href="/">Back to Search</a></p>
     <script>
     let isMovie = {{ 'true' if is_movie else 'false' }};
 
-      if (!isMovie){
+    if (!isMovie){
       var episodes = {{ episodes|safe }};
       const episodes_div = document.getElementById("episodes");
       const seasons_div = document.getElementById("seasons");
@@ -56,7 +75,6 @@
 
       seasons.forEach((name, index) => {
         const season = document.createElement("div");
-        season.style.background = "grey";
         season.classList.add("season");
         season.textContent = name;
 
@@ -68,7 +86,6 @@
 
       episodes.forEach((name, index) => {
         const episode = document.createElement("div");
-        episode.style.background = "grey";
         episode.classList.add("episode");
         episode.textContent = `${index + 1}. ${name}`;
 

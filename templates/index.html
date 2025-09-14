@@ -307,11 +307,10 @@
           .then((response) => response.json())
           .then((data) => {
             resultsDiv.innerHTML = "";
-            data.forEach((item) => {
+            data.forEach((item) => {//why did I do it like this??
               const resultDiv = document.createElement("div");
               resultDiv.className = "movie-card";
 
-              //resultDiv.style.height = `${140 + 3 * 16}px`;
               resultDiv.dataset.customdata = item.id;
 
               const movie_thumbnail = document.createElement("div");
@@ -389,61 +388,6 @@
                   "/play/" + resultDiv.dataset.customdata + "/1/1";
               });
               resultsDiv.appendChild(resultDiv);
-
-/*
-              TitleDiv.className="title"
-              TitleDiv.innerText=item.title
-
-              if (item.type.toUpperCase() == "TV SERIES"){
-                informationDiv.innerText=item.year
-              }else{
-                const typeDiv = document.createElement("span");
-                typeDiv.style="border: 1px solid white; border-radius: 10px; padding-left: 5px; padding-right: 5px;";
-                typeDiv.innerText="Movie"
-                informationDiv.appendChild(typeDiv);
-                informationDiv.innerText=item.year + "   " + item.lenght
-              }
-
-              detailsDiv.appendChild(TitleDiv);
-              detailsDiv.appendChild(informationDiv);
-              
-              resultDiv.appendChild(detailsDiv)
-*/
-
-/*
-            <div class="movie-card">
-                <div class="movie-thumbnail">
-                    <img src="https://source.unsplash.com/random/300x450?sig=1&movie" alt="Inception">
-                    <div class="hover-content">
-                        <h3>Inception</h3>
-                        <p>A thief who steals corporate secrets by entering the subconscious of his targets.</p>
-                        <button class="play-button"><i class="fas fa-play"></i> Watch Now</button>
-                    </div>
-                </div>
-                <div class="movie-details">
-                    <h3 class="movie-title">Inception</h3>
-                    <div class="movie-info">
-                        <div class="movie-rating">
-                            <i class="fas fa-star"></i>
-                            <span>8.8</span>
-                        </div>
-                        <div class="movie-duration">148m</div>
-                    </div>
-                    <div class="movie-year">2010</div>
-                </div>
-            </div>
-*/
-
-
-
-              /*
-              resultDiv.innerHTML = `
-                            <img src="${item.thumbnail}" alt="Thumbnail" class="thumbnail">
-                            <div class="details">
-                                <div>${type}   ${item.year}     ${item.lenght}min</div>
-                                <div class="title">${item.title}</div>
-                            </div>
-                        `;*/
             });
           })
           .catch((error) => console.error(error));
